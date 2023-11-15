@@ -10,7 +10,8 @@ echo
 while read -r i;do 
 
     URL=$i
-    NAME="${i#http*://}"
+    # NAME="${i#http*://}"
+    NAME="$(echo "$i"|sed -e 's|://|.|' -e 's#/#-#g')"
     RESPONSE="curl -X POST --form "size=256" --form "url=${URL}" --output data/${NAME}.png http://localhost:8080/generate"
     echo "URL: $URL"
     echo "NAME: $NAME";
