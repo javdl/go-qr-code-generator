@@ -32,7 +32,7 @@ The curl example, below, shows how to create a QR code 256x256 px that embeds "h
 ```bash
 curl -X POST \
     --form "size=256" \
-    --form "url=https://arstechnica.com" \
+    --form "url=https://fashionunited.com" \
     --output data/qrcode.png \
     http://localhost:8080/generate
 ```
@@ -43,7 +43,7 @@ Below is an example of how to do so with curl.
 ```bash
 curl -X POST \
     --form "size=256" \
-    --form "url=https://matthewsetter.com" \
+    --form "url=https://fashionunited.com" \
     --form "watermark=@data/twilio-logo.png" \
     --output data/qrcode.png \
     http://localhost:8080/generate
@@ -53,3 +53,5 @@ curl -X POST \
 [go-url]: https://go.dev/
 [curl-url]: https://curl.se/
 [postman-url]: https://www.postman.com/downloads/
+
+Credits to Matthew Setter, his blogpost [https://www.twilio.com/blog/generate-qr-code-with-go](https://www.twilio.com/blog/generate-qr-code-with-go) explains this code.
