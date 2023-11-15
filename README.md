@@ -33,3 +33,12 @@ Put a list of urls in example.txt. Make sure there is a newline at the end.
 ```
 ./generate.sh
 ```
+
+## Deploy
+
+```sh
+gcloud auth login
+gcloud auth configure-docker
+
+run deploy go-qr-code-generator --project kubernetes-164514 --image gcr.io/kubernetes-164514/go-qr-code-generator --client-name Cloud Code for VS Code --client-version 2.1.1 --platform managed --region europe-west1 --allow-unauthenticated --port 8080 --cpu 1 --memory 256Mi --concurrency 80 --timeout 300 --clear-env-vars
+```
