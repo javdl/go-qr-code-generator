@@ -36,9 +36,15 @@ Put a list of urls in example.txt. Make sure there is a newline at the end.
 
 ## Deploy
 
+This will deploy the source code, but still creates a container from it using Buildkit. 
+
 ```sh
 gcloud auth login
 gcloud config set project kubernetes-164514
 gcloud auth configure-docker
-gcloud run deploy
+
+gcloud config set run/region europe-west1
+gcloud run deploy --source .
 ```
+
+This command is equivalent to running `gcloud builds submit --pack image=[IMAGE] .` and `gcloud run deploy go-qr-code-generator --image [IMAGE]`
