@@ -33,3 +33,9 @@ Put a list of urls in example.txt. Make sure there is a newline at the end.
 ```
 ./generate.sh
 ```
+
+## Deploy to Google Cloud Run
+
+```sh
+gcloud run deploy
+```
