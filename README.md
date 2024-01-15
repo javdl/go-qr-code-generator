@@ -37,5 +37,16 @@ Put a list of urls in example.txt. Make sure there is a newline at the end.
 ## Deploy to Google Cloud Run
 
 ```sh
-gcloud run deploy
+gcloud config set project PROJECT_ID
+gcloud run deploy --region=europe-west1 --allow-unauthenticated
+```
+
+Test if the API works
+
+```sh
+curl -X POST \
+    --form "size=256" \
+    --form "url=https://fashionunited.nl/modevacatures/werken-bij/ray-ban-vacatures/search/in/rotterdam" \
+    --output data/ray-ban-rotterdam.png \
+    https://go-qr-code-generator-XXXXXXXXXX.a.run.app/generate
 ```
