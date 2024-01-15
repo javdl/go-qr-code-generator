@@ -41,7 +41,13 @@ gcloud config set project PROJECT_ID
 gcloud run deploy --region=europe-west1 --allow-unauthenticated
 ```
 
-Test if the API works
+## Get the service URL without deploying
+
+```sh
+gcloud run services describe go-qr-code-generator --platform managed --region europe-west1 --format 'value(status.url)'
+```
+
+## Test if the API works
 
 ```sh
 curl -X POST \
