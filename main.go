@@ -112,7 +112,7 @@ func newApp(ctx context.Context, port, projectID string) (*App, error) {
 	// Setup request router.
 	r := mux.NewRouter()
 	r.HandleFunc("/generate", handleRequest).
-		Methods("GET")
+		Methods("POST")
 	app.Server.Handler = r
 
 	http.ListenAndServe(":8080", r)
