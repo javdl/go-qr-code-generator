@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -13,10 +14,20 @@ import (
 	"log"
 	"mime/multipart"
 	"net/http"
+	"os"
+	"os/signal"
 	"strconv"
+	"time"
 
 	"github.com/nfnt/resize"
+	"github.com/settermjq/go-qr-code-generator/metadata"
 	qrcode "github.com/skip2/go-qrcode"
+
+	"cloud.google.com/go/logging"
+	"github.com/gorilla/mux"
+	"google.golang.org/api/option"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 const MAX_UPLOAD_SIZE = 1024 * 1024 // 1MB
@@ -25,6 +36,88 @@ const WATERMARK_WIDTH = 64
 type simpleQRCode struct {
 	Content string
 	Size    int
+}
+type App struct {
+	*http.Server
+	projectID string
+	log       *logging.Logger
+}
+
+func main() {
+	ctx := context.Background()
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	log.Printf("listening on port %s", port)
+	projectID := os.Getenv("GOOGLE_CLOUD_PROJECT")
+	app, err := newApp(ctx, port, projectID)
+	if err != nil {
+		log.Fatalf("unable to initialize application: %v", err)
+	}
+	log.Println("starting HTTP server")
+	go func() {
+		if err := app.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("Server closed: %v", err)
+		}
+	}()
+
+	// Listen for SIGINT to gracefully shutdown.
+	nctx, stop := signal.NotifyContext(ctx, os.Interrupt, os.Kill)
+	defer stop()
+	<-nctx.Done()
+	log.Println("shutdown initiated")
+
+	// Cloud Run gives apps 10 seconds to shutdown. See
+	// https://cloud.google.com/blog/topics/developers-practitioners/graceful-shutdowns-cloud-run-deep-dive
+	// for more details.
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+	app.Shutdown(ctx)
+	log.Println("shutdown")
+
+}
+
+func newApp(ctx context.Context, port, projectID string) (*App, error) {
+	app := &App{
+		Server: &http.Server{
+			Addr: ":" + port,
+			// Add some defaults, should be changed to suit your use case.
+			ReadTimeout:    10 * time.Second,
+			WriteTimeout:   10 * time.Second,
+			MaxHeaderBytes: 1 << 20,
+		},
+	}
+
+	if projectID == "" {
+		projID, err := metadata.ProjectID()
+		if err != nil {
+			return nil, fmt.Errorf("unable to detect Project ID from GOOGLE_CLOUD_PROJECT or metadata server: %w", err)
+		}
+		projectID = projID
+	}
+	app.projectID = projectID
+
+	client, err := logging.NewClient(ctx, fmt.Sprintf("projects/%s", app.projectID),
+		// We don't need to make any requests when logging to stderr.
+		option.WithoutAuthentication(),
+		option.WithGRPCDialOption(
+			grpc.WithTransportCredentials(insecure.NewCredentials()),
+		))
+	if err != nil {
+		return nil, fmt.Errorf("unable to initialize logging client: %v", err)
+	}
+	app.log = client.Logger("test-log", logging.RedirectAsJSON(os.Stderr))
+
+	// Setup request router.
+	r := mux.NewRouter()
+	r.HandleFunc("/generate", handleRequest).
+		Methods("GET")
+	app.Server.Handler = r
+
+	http.ListenAndServe(":8080", r)
+
+	return app, nil
 }
 
 // Generate generates a QR code using the value of simpleQRCode.Content
