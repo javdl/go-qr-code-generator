@@ -56,3 +56,22 @@ curl -X POST \
     --output data/ray-ban-rotterdam.png \
     https://go-qr-code-generator-XXXXXXXXXX.a.run.app/generate
 ```
+
+
+### CLI tooling
+
+#### Local development
+
+1. Set Project Id:
+
+    ```bash
+    export GOOGLE_CLOUD_PROJECT=<GCP_PROJECT_ID>
+    # in this case:
+    export GOOGLE_CLOUD_PROJECT=go-qr-code-generator
+    ```
+
+<!-- 2. Build and Start the server:
+
+    ```bash
+    go build -o server && ./server
+    ``` -->
