@@ -1,4 +1,6 @@
 # QR code generator in Go
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fjavdl%2Fgo-qr-code-generator.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fjavdl%2Fgo-qr-code-generator?ref=badge_shield)
+
 
 This is a small repository showing how to generate a QR code with an optional watermark in Go.
 
@@ -75,3 +77,6 @@ curl -X POST \
     ```bash
     go build -o server && ./server
     ``` -->
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fjavdl%2Fgo-qr-code-generator.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fjavdl%2Fgo-qr-code-generator?ref=badge_large)
