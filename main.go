@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
 	"image"
 	"image/draw"
@@ -259,7 +260,7 @@ func handleRequest(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	contentType := http.DetectContentType(watermark)
-	if err != nil {
+	if contentType != "image/png" {
 		response := buildErrorResponse(fmt.Sprintf("Provided watermark image is a %s not a PNG. %v.", err, contentType))
 		writer.Write(response)
 		writer.WriteHeader(400)
@@ -283,4 +284,18 @@ func handleRequest(writer http.ResponseWriter, request *http.Request) {
 
 	writer.Header().Add("Content-Type", "image/png")
 	writer.Write(codeData)
+}
+
+func main() {
+	addr := flag.String("addr", ":8080", "HTTP network address")
+	flag.Parse()
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/generate", handleRequest)
+
+	log.Printf("Starting server on %s", *addr)
+	err := http.ListenAndServe(*addr, mux)
+	if err != nil {
+		log.Fatalln(err)
+	}
 }

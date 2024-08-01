@@ -2,7 +2,15 @@
 
 This is a small repository showing how to generate a QR code with an optional watermark in Go.
 
-Credits to Matthew Setter, his blogpost [https://www.twilio.com/blog/generate-qr-code-with-go](https://www.twilio.com/blog/generate-qr-code-with-go) explains this code. Note: the blogpost mentions `content=` instead of `url=` to use for the content you want to encode in the QR code.
+Credits to Matthew Setter, his blogpost ["How to Generate a QR Code with Go"][tutorial-url] explains this code. Note: the blogpost mentions `content=` instead of `url=` to use for the content you want to encode in the QR code.
+
+## Prerequisites
+
+To follow along with the tutorial, you don't need much, just the following things:
+
+- [Go][go-url] (a recent version, or the latest, 1.20.5)
+- [Curl][curl-url] or [Postman][postman-url]
+- A smartphone with a QR code scanner (which, these days, most of them should have)
 
 ## Start the API
 
@@ -22,6 +30,18 @@ curl -i -X POST http://localhost:8080/generate
 curl -X POST \
     --form "size=256" \
     --form "url=https://fashionunited.com" \
+    --output data/qrcode.png \
+    http://localhost:8080/generate
+```
+
+You can also watermark the QR code, by uploading a PNG file using the `watermark` POST variable.
+Below is an example of how to do so with curl.
+
+```bash
+curl -X POST \
+    --form "size=256" \
+    --form "url=https://fashionunited.com" \
+    --form "watermark=@data/twilio-logo.png" \
     --output data/qrcode.png \
     http://localhost:8080/generate
 ```
@@ -75,3 +95,8 @@ curl -X POST \
     ```bash
     go build -o server && ./server
     ``` -->
+    
+[tutorial-url]: https://www.twilio.com/blog/generate-qr-code-with-go
+[go-url]: https://go.dev/
+[curl-url]: https://curl.se/
+[postman-url]: https://www.postman.com/downloads/
